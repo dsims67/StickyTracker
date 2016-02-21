@@ -1,6 +1,7 @@
-package main.java.com.aetheriumwars.stickytracker;
+package com.aetheriumwars.stickytracker;
 
 import java.io.File;
+
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
