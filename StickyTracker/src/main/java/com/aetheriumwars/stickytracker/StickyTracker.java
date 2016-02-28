@@ -48,7 +48,7 @@ public class StickyTracker extends JavaPlugin{
         config = this.getConfig();
         //this.getConfig().options().copyDefaults(true);
 
-        File configFile = new File(getPlugin().getDataFolder()+File.separator+"config.yml");
+        final File configFile = new File(getPlugin().getDataFolder()+File.separator+"config.yml");
 		/*if(!configFile.exists())
 			initConfig();*/
 
@@ -96,7 +96,7 @@ public class StickyTracker extends JavaPlugin{
                                 t.getEffect().setDynamicOrigin(new DynamicLocation(t.getOwner().getLocation()));
                                 t.getEffect().setDynamicTarget(new DynamicLocation(midpoint));
 
-                                if(t.isDebugState()){
+                                if(config.getBoolean("debug")){
                                     t.getOwner().sendMessage("§aYour position§7:§e " + t.getOwner().getLocation().getBlockX() + "§7,§e " + t.getOwner().getLocation().getBlockY() + "§7,§e " + t.getOwner().getLocation().getBlockZ());
                                     t.getOwner().sendMessage("§aTarget position§7:§e " + t.getTarget().getLocation().getBlockX() + "§7,§e " + t.getTarget().getLocation().getBlockY() + "§7,§e " + t.getTarget().getLocation().getBlockZ());
                                     t.getOwner().sendMessage("");
