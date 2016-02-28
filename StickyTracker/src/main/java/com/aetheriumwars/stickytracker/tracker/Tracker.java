@@ -20,12 +20,10 @@ public class Tracker {
     private UUID ownerId;
     private UUID targetId;
     private LineEffect lineEffect;
-    private boolean debugState;
 
-    public Tracker(Player owner, Player target, boolean debugState) {
+    public Tracker(Player owner, Player target) {
         this.ownerId = owner.getUniqueId();
         this.targetId = target.getUniqueId();
-        this.debugState = debugState;
         this.generateTrail();
         StickyTracker.addTracker(this);
     }
@@ -79,10 +77,6 @@ public class Tracker {
         //lineEffect.particleOffsetY = 1;
 
         lineEffect.start();
-    }
-
-    public boolean isDebugState(){
-        return debugState;
     }
 
 }
