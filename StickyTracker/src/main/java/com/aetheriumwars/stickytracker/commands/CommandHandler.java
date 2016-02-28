@@ -17,7 +17,7 @@ public class CommandHandler implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (player.isOp() && command.getName().equalsIgnoreCase("stickytracker") && args != null && args.length >= 1) {
-                if (args[0].equalsIgnoreCase("test") && args.length == 2) {
+                if (args[0].equalsIgnoreCase("test") && args.length >= 2) {
                     Player target = Bukkit.getPlayer(args[1]);
                     if(target == null) {
                         sender.sendMessage("§a§lStickyTracker: §cPlayer not found");
@@ -27,23 +27,7 @@ public class CommandHandler implements CommandExecutor {
                         sender.sendMessage("§a§lStickyTracker: §cYou cant track yourself");
                         return false;
                     }
-                    new Tracker(player, target, false).generateTrail();
-                    sender.sendMessage("§a§lStickyTracker: "+ChatColor.AQUA+"testing the tracking effect with "+target.getDisplayName());
-                    return true;
-                }
-                else if (args[0].equalsIgnoreCase("test") && args.length >= 3) {
-                    Player target = Bukkit.getPlayer(args[1]);
-                    if(target == null) {
-                        sender.sendMessage("§a§lStickyTracker: §cPlayer not found");
-                        return false;
-                    }
-                    if(target == player) {
-                        sender.sendMessage("§a§lStickyTracker: §cYou cant track yourself");
-                        return false;
-                    }
-                    if(args[2].equalsIgnoreCase("debug")){
-                        new Tracker(player, target, true).generateTrail();
-                    }
+                    new Tracker(player, target).generateTrail();
                     sender.sendMessage("§a§lStickyTracker: "+ChatColor.AQUA+"testing the tracking effect with "+target.getDisplayName());
                     return true;
                 }
