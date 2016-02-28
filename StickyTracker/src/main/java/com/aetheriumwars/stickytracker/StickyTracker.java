@@ -9,15 +9,19 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
 import com.aetheriumwars.stickytracker.commands.CommandHandler;
+import com.aetheriumwars.stickytracker.listeners.OnHitWithTracker;
+import com.aetheriumwars.stickytracker.listeners.OnPlayerQuit;
 import com.aetheriumwars.stickytracker.tracker.Tracker;
 
 import de.slikey.effectlib.EffectManager;
@@ -32,6 +36,7 @@ public class StickyTracker extends JavaPlugin{
 	
 	private static HashMap<UUID, Tracker> trackers = new HashMap<UUID, Tracker>();
 	
+	public static Material trackerItem = Material.DAYLIGHT_DETECTOR;
 	private static int closestProximity = 10; //when the tracker gets within this distance of the trackee, the particles disappear
 	
 	@Override
@@ -54,7 +59,9 @@ public class StickyTracker extends JavaPlugin{
 			getLogger().info("Created TrackerData Directory");
 		
 		//register listeners
-		//registerListener(new BindAbilityListener());
+		registerListener(new OnPlayerQuit());
+		registerListener(new OnHitWithTracker());
+		
 
 		//register commands
         getCommand("stickytracker").setExecutor(new CommandHandler());
@@ -103,7 +110,7 @@ public class StickyTracker extends JavaPlugin{
 	            	
             	}
             }
-        }, 10L, 3L);
+        }, 10L, 2L);
 	}
 	
 	@Override
@@ -138,8 +145,16 @@ public class StickyTracker extends JavaPlugin{
 
 	}
 	
+	public static boolean hasTracker(Player p) {
+		return(trackers.containsKey(p.getUniqueId()));
+	}
+	
 	public static HashMap<UUID, Tracker> getTrackers() {
 		return trackers;
+	}
+	
+	private void registerListener(Listener l) {
+		this.getServer().getPluginManager().registerEvents(l, this);
 	}
 	
 }
