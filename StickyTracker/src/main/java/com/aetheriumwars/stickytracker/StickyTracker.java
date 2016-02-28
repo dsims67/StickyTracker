@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.util.Vector;
 
 import com.aetheriumwars.stickytracker.commands.CommandHandler;
 import com.aetheriumwars.stickytracker.tracker.Tracker;
@@ -78,8 +80,17 @@ public class StickyTracker extends JavaPlugin{
 	            				t.removeTrail();
 	            			}
 	            			else {
-		            			t.getEffect().setDynamicOrigin(new DynamicLocation(t.getOwner().getLocation()));
-		            			t.getEffect().setDynamicTarget(new DynamicLocation(t.getTarget().getLocation().add(0,11,0)));
+	            				
+	            				Location startLoc = t.getOwner().getLocation();
+	            				Location endLoc = t.getTarget().getLocation();
+	            				
+	            				Location midpoint = new Location(t.getOwner().getWorld(), (startLoc.getX()+endLoc.getX())/2, 
+	            						(startLoc.getY()+endLoc.getY())/2, (startLoc.getZ()+endLoc.getZ())/2);
+	            				
+	            				//System.out.println("Starting at: "+startLoc.toString()+" Ending at: "+midpoint.toString());
+	            				t.getEffect().setDynamicOrigin(new DynamicLocation(t.getOwner().getLocation()));
+	            				t.getEffect().setDynamicTarget(new DynamicLocation(midpoint));
+	            				
 	            			}
 	            		}
 	            		else {
@@ -92,7 +103,7 @@ public class StickyTracker extends JavaPlugin{
 	            	
             	}
             }
-        }, 1L, 1L);
+        }, 10L, 3L);
 	}
 	
 	@Override
