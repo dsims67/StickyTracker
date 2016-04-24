@@ -130,23 +130,50 @@ public class StickyTracker extends JavaPlugin{
 	}
 	
 	public static void addTracker(Tracker t) {
-		//a player can only have 1 tracker active at a time
+		//a player can only own 1 tracker at a time
 		if(trackers.containsKey(t.getOwnerID()))
-			removeTracker(t.getOwner());
+			removeTrackerOwnedBy(t.getOwner());
 		
 		trackers.put(t.getOwnerID(), t);
 	}
 	
-	public static void removeTracker(Player p) {
+	//removes the tracker owned by player p, or attached to player p
+	public static boolean removeTrackerOwnedBy(Player p) {
 		if(trackers.containsKey(p.getUniqueId())) {
 			trackers.get(p.getUniqueId()).removeTrail();
 			trackers.remove(p.getUniqueId());
+			return true;
+		}
+		else {
+			return false;
 		}
 
 	}
 	
+	//returns true if it removed the tracker attached to the player
+	public static boolean removeTrackerAttachedTo(Player p) {
+		Tracker t = isBeingTracked(p);
+		if(t != null) {
+			trackers.remove(t.getOwnerID());
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	
 	public static boolean hasTracker(Player p) {
 		return(trackers.containsKey(p.getUniqueId()));
+	}
+	
+	//Returns the tracker if the player is being tracked, otherwise returns null
+	public static Tracker isBeingTracked(Player p) {
+		for(Tracker t: trackers.values()) {
+			if(t.getTargetID().equals(p.getUniqueId()))
+				return t;
+		}
+		return null;
 	}
 	
 	public static HashMap<UUID, Tracker> getTrackers() {

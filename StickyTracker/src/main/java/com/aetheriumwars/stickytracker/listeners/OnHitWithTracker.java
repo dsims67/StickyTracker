@@ -24,7 +24,7 @@ public class OnHitWithTracker implements Listener{
 			//if(tracker.getItemInHand().getType().equals(StickyTracker.trackerItem)) {
 			if(tracker.getItemInHand().getTypeId() == 151) {
 				if(StickyTracker.hasTracker(tracker)) {
-					StickyTracker.removeTracker(tracker);
+					StickyTracker.removeTrackerOwnedBy(tracker);
 				}
 				
 				StickyTracker.addTracker(new Tracker(tracker, trackee));

@@ -6,3 +6,4 @@ bin/
 .settings/
 .recommenders/
 target/
+server/

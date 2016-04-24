@@ -28,7 +28,7 @@ public class CommandHandler implements CommandExecutor {
 						return true;
 					}
 					else if(args[0].equalsIgnoreCase("clear")) {
-						StickyTracker.removeTracker(player);
+						StickyTracker.removeTrackerOwnedBy(player);
 						sender.sendMessage("§a§lStickyTracker: "+ChatColor.AQUA+"removing your trackers.");
 						return true;
 					}
@@ -36,10 +36,11 @@ public class CommandHandler implements CommandExecutor {
 						for(Tracker t : StickyTracker.getTrackers().values()) {
 							sender.sendMessage("Owner: "+t.getOwner().getDisplayName()+" Target: "+t.getTarget().getDisplayName());
 						}
+						return true;
 					}
 			}
 			
-			player.sendMessage("§a§lStickyTracker: &cCommand not found.");
+			player.sendMessage("§a§lStickyTracker: §cCommand not found.");
 			printHelp(player);
 		}
 		
@@ -47,7 +48,9 @@ public class CommandHandler implements CommandExecutor {
 	}
 	
     public void printHelp(Player p) {
-    	p.sendMessage("§l§oST: /test -> test the particle trail");
+    	p.sendMessage("§l§oST: /test <player>  -> test the particle trail");
+    	p.sendMessage("§l§oST: /list -> list all of the trackers active");
+    	p.sendMessage("§l§oST: /clear -> removes trackers you own");
     }
 		
 }

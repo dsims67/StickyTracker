@@ -41,6 +41,10 @@ public class Tracker {
 		return Bukkit.getPlayer(targetId);
 	}
 	
+	public UUID getTargetID() {
+		return targetId;
+	}
+	
 	public LineEffect getEffect() {
 		return lineEffect;
 	}
