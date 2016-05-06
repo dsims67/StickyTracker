@@ -7,6 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.aetheriumwars.stickytracker.StickyTracker;
+import com.aetheriumwars.stickytracker.enums.EnumPermission;
 import com.aetheriumwars.stickytracker.tracker.Tracker;
 
 import net.md_5.bungee.api.ChatColor;
@@ -16,7 +17,7 @@ public class CommandHandler implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) { 
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			if (player.isOp() && command.getName().equalsIgnoreCase("stickytracker") && args != null && args.length >= 1) {
+			if (player.hasPermission(EnumPermission.ST_ADMIN.getPermission()) && command.getName().equalsIgnoreCase("stickytracker") && args != null && args.length >= 1) {
 					if (args[0].equalsIgnoreCase("test") && args.length >= 2) {
 						Player target = Bukkit.getPlayer(args[1]);
 						if(target == null || player == null) {
@@ -28,13 +29,13 @@ public class CommandHandler implements CommandExecutor {
 						return true;
 					}
 					else if(args[0].equalsIgnoreCase("clear")) {
-						StickyTracker.removeTrackerOwnedBy(player);
+						Tracker.removeTrackerOwnedBy(player);
 						sender.sendMessage("§a§lStickyTracker: "+ChatColor.AQUA+"removing your trackers.");
 						return true;
 					}
 					else if(args[0].equalsIgnoreCase("list")) { //list the trackers
 						for(Tracker t : StickyTracker.getTrackers().values()) {
-							sender.sendMessage("Owner: "+t.getOwner().getDisplayName()+" Target: "+t.getTarget().getDisplayName());
+							sender.sendMessage("Owner: "+t.getOwner().getName()+" Target: "+t.getTarget().getName());
 						}
 						return true;
 					}

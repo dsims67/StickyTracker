@@ -1,11 +1,15 @@
 package com.aetheriumwars.stickytracker;
 
 import java.io.File;
-
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,10 +21,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.util.Vector;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.aetheriumwars.stickytracker.commands.CommandHandler;
+import com.aetheriumwars.stickytracker.listeners.OnFireDamage;
 import com.aetheriumwars.stickytracker.listeners.OnHitWithTracker;
+import com.aetheriumwars.stickytracker.listeners.OnPlayerDeath;
+import com.aetheriumwars.stickytracker.listeners.OnPlayerJoin;
 import com.aetheriumwars.stickytracker.listeners.OnPlayerQuit;
 import com.aetheriumwars.stickytracker.tracker.Tracker;
 
@@ -38,6 +47,7 @@ public class StickyTracker extends JavaPlugin{
 	
 	public static Material trackerItem = Material.DAYLIGHT_DETECTOR;
 	private static int closestProximity = 10; //when the tracker gets within this distance of the trackee, the particles disappear
+	private static String trackerFilename = "trackers.json";
 	
 	@Override
 	public void onEnable() {
@@ -54,14 +64,26 @@ public class StickyTracker extends JavaPlugin{
 			initConfig();*/
 		
 		//make trackerdata folder
-		boolean successful = new File(getPlugin().getDataFolder()+File.separator+"TrackerData").mkdir();
-		if(successful)
-			getLogger().info("Created TrackerData Directory");
+		File trackerFile = new File(getPlugin().getDataFolder()+File.separator+trackerFilename);
+		if(!trackerFile.exists()) {
+			try {
+				trackerFile.createNewFile();
+				getLogger().info("Created "+trackerFilename+" file.");
+			} catch (IOException e) {
+				getLogger().log(Level.SEVERE, e.getMessage(), e);
+			}
+			
+		}
+		else {
+			trackers = loadTrackers();
+		}
 		
 		//register listeners
+		registerListener(new OnPlayerJoin());
 		registerListener(new OnPlayerQuit());
 		registerListener(new OnHitWithTracker());
-		
+		registerListener(new OnFireDamage());
+		registerListener(new OnPlayerDeath());
 
 		//register commands
         getCommand("stickytracker").setExecutor(new CommandHandler());
@@ -81,27 +103,34 @@ public class StickyTracker extends JavaPlugin{
             	//save every 5 mins
             	if(trackers.size() > 0) {
 	            	for(Tracker t: trackers.values()) {
+	            		if(t == null || t.getOwner() == null || t.getTarget() == null)
+	            			continue;
+	            		
+            			Player owner = (Player) t.getOwner();
+            			Player target = (Player) t.getTarget();
+            			
 	            		if(!t.isHidden()) {
+	            			
 	            			//if the distance is less than the closest proximity, hide the particles
-	            			if(t.getOwner().getLocation().distance(t.getTarget().getLocation()) <= closestProximity) {
-	            				t.removeTrail();
+	            			if(owner.getLocation().distance(target.getLocation()) <= closestProximity) {
+	            				t.hide();
 	            			}
 	            			else {
 	            				
-	            				Location startLoc = t.getOwner().getLocation();
-	            				Location endLoc = t.getTarget().getLocation();
+	            				Location startLoc = owner.getLocation();
+	            				Location endLoc = target.getLocation();
 	            				
-	            				Location midpoint = new Location(t.getOwner().getWorld(), (startLoc.getX()+endLoc.getX())/2, 
+	            				Location midpoint = new Location(owner.getWorld(), (startLoc.getX()+endLoc.getX())/2, 
 	            						(startLoc.getY()+endLoc.getY())/2, (startLoc.getZ()+endLoc.getZ())/2);
 	            				
 	            				//System.out.println("Starting at: "+startLoc.toString()+" Ending at: "+midpoint.toString());
-	            				t.getEffect().setDynamicOrigin(new DynamicLocation(t.getOwner().getLocation()));
+	            				t.getEffect().setDynamicOrigin(new DynamicLocation(owner.getLocation()));
 	            				t.getEffect().setDynamicTarget(new DynamicLocation(midpoint));
 	            				
 	            			}
 	            		}
 	            		else {
-	            			if(t.getOwner().getLocation().distance(t.getTarget().getLocation()) > closestProximity && t.isHidden()) {
+	            			if(owner.getLocation().distance(target.getLocation()) > closestProximity && t.isHidden()) {
 	            				t.generateTrail();
 	            			}
 	            		}
@@ -111,6 +140,7 @@ public class StickyTracker extends JavaPlugin{
             	}
             }
         }, 10L, 2L);
+        
 	}
 	
 	@Override
@@ -129,55 +159,49 @@ public class StickyTracker extends JavaPlugin{
 		return effectManager;
 	}
 	
-	public static void addTracker(Tracker t) {
-		//a player can only own 1 tracker at a time
-		if(trackers.containsKey(t.getOwnerID()))
-			removeTrackerOwnedBy(t.getOwner());
-		
-		trackers.put(t.getOwnerID(), t);
-	}
-	
-	//removes the tracker owned by player p, or attached to player p
-	public static boolean removeTrackerOwnedBy(Player p) {
-		if(trackers.containsKey(p.getUniqueId())) {
-			trackers.get(p.getUniqueId()).removeTrail();
-			trackers.remove(p.getUniqueId());
-			return true;
-		}
-		else {
-			return false;
-		}
-
-	}
-	
-	//returns true if it removed the tracker attached to the player
-	public static boolean removeTrackerAttachedTo(Player p) {
-		Tracker t = isBeingTracked(p);
-		if(t != null) {
-			trackers.remove(t.getOwnerID());
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-	
-	
-	public static boolean hasTracker(Player p) {
-		return(trackers.containsKey(p.getUniqueId()));
-	}
-	
-	//Returns the tracker if the player is being tracked, otherwise returns null
-	public static Tracker isBeingTracked(Player p) {
-		for(Tracker t: trackers.values()) {
-			if(t.getTargetID().equals(p.getUniqueId()))
-				return t;
-		}
-		return null;
-	}
-	
 	public static HashMap<UUID, Tracker> getTrackers() {
 		return trackers;
+	}
+	
+	public static void saveTrackers() {
+		JSONObject json = new JSONObject();
+		
+		for(Tracker t: trackers.values()) {
+			json.put(t.getOwnerID().toString(), t.getTargetID().toString());
+		}
+		
+		try {
+			FileWriter file = new FileWriter(getPlugin().getDataFolder()+File.separator+trackerFilename);
+			file.write(json.toJSONString());
+			file.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
+	
+	private static HashMap<UUID, Tracker> loadTrackers() {
+		HashMap<UUID, Tracker> map = new HashMap<UUID, Tracker>();
+		String fileLoc = getPlugin().getDataFolder()+File.separator+trackerFilename;
+		JSONParser parser = new JSONParser();
+		try {
+			Object obj;
+			obj = parser.parse(new FileReader(fileLoc));
+			JSONObject json = (JSONObject) obj;
+			
+			for(Iterator iterator = json.keySet().iterator(); iterator.hasNext();) {
+			    String ownerId = (String) iterator.next();
+			    String targetId = (String) json.get(ownerId);
+			    map.put(UUID.fromString(ownerId), new Tracker(ownerId, targetId));
+			}
+			
+			return map;
+			
+		} catch (IOException ex) {
+			ex.printStackTrace();
+			return map;
+		} catch(ParseException ex) {
+			return map;
+		}
 	}
 	
 	private void registerListener(Listener l) {
