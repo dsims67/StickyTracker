@@ -31,6 +31,7 @@ import com.aetheriumwars.stickytracker.listeners.OnHitWithTracker;
 import com.aetheriumwars.stickytracker.listeners.OnPlayerDeath;
 import com.aetheriumwars.stickytracker.listeners.OnPlayerJoin;
 import com.aetheriumwars.stickytracker.listeners.OnPlayerQuit;
+import com.aetheriumwars.stickytracker.listeners.OnTrackerInteract;
 import com.aetheriumwars.stickytracker.tracker.Tracker;
 
 import de.slikey.effectlib.EffectManager;
@@ -90,6 +91,7 @@ public class StickyTracker extends JavaPlugin{
 		registerListener(new OnPlayerQuit());
 		registerListener(new OnHitWithTracker());
 		registerListener(new OnPlayerDeath());
+		registerListener(new OnTrackerInteract());
 		
 		if(fireDestroyEnabled)
 			registerListener(new OnFireDamage());
@@ -109,7 +111,6 @@ public class StickyTracker extends JavaPlugin{
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
-            	//save every 5 mins
             	if(trackers.size() > 0) {
 	            	for(Tracker t: trackers.values()) {
 	            		if(t == null || t.getOwner() == null || t.getTarget() == null)
@@ -118,7 +119,7 @@ public class StickyTracker extends JavaPlugin{
             			Player owner = (Player) t.getOwner();
             			Player target = (Player) t.getTarget();
             			
-	            		if(!t.isHidden()) {
+	            		if(t.isHidden() == false && t.hiddenByPlayer() == false) {
 	            			
 	            			//if the distance is less than the closest proximity, hide the particles
 	            			if(owner.getLocation().distance(target.getLocation()) <= closestProximity) {
@@ -138,7 +139,7 @@ public class StickyTracker extends JavaPlugin{
 	            				
 	            			}
 	            		}
-	            		else {
+	            		else if(t.hiddenByPlayer() == false){
 	            			if(owner.getLocation().distance(target.getLocation()) > closestProximity && t.isHidden()) {
 	            				t.generateTrail();
 	            			}

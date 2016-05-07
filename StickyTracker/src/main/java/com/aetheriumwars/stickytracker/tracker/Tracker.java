@@ -26,6 +26,7 @@ public class Tracker {
 	private static int visibility = 10; //how far can you see the path
 	private static String playerWithTrackerHead = "Mercury777";
 	
+	private  boolean playerHid = false; //true if the owner has the trail hidden
 	private UUID ownerId;
 	private UUID targetId;
 	private LineEffect lineEffect;
@@ -97,7 +98,7 @@ public class Tracker {
 		}
 	}
 	
-	
+	//Returns true if the player has a tracker
 	public static boolean hasTracker(Player p) {
 		return(StickyTracker.getTrackers().containsKey(p.getUniqueId()));
 	}
@@ -109,6 +110,11 @@ public class Tracker {
 				return t;
 		}
 		return null;
+	}
+	
+	//Returns the tracker owned by the player
+	public static Tracker getTracker(Player p) {
+		return StickyTracker.getTrackers().get(p.getUniqueId());
 	}
 	
 	//actually attaches the tracker to the target player
@@ -176,6 +182,15 @@ public class Tracker {
 			return false;
 	}
 	
+	//returns true if the player has the trail hidden
+	public boolean hiddenByPlayer() {
+		return playerHid;
+	}
+	
+	public void setHiddenByPlayer(boolean hid) {
+		this.playerHid = hid;
+	}
+	
 	//hides the tracker and the trail
 	public void hide() {
 		//despawnTracker();
@@ -200,10 +215,10 @@ public class Tracker {
 	
 	//generates and updates the trail of particles leading to the player
 	public void generateTrail() {
-		Player owner = (Player) getOwner();
-		Player target = (Player) getTarget();
+		OfflinePlayer owner = getOwner();
+		OfflinePlayer target = getTarget();
 		
-		if(getOwner().isOnline() && getTarget().isOnline()) {
+		if(owner != null && owner.isOnline() && target != null && target.isOnline()) {
 			this.lineEffect = new LineEffect(StickyTracker.getEffectManager());
 			//lineEffect.particle = ParticleEffect.REDSTONE;
 			lineEffect.period = 1;
@@ -215,14 +230,8 @@ public class Tracker {
 			lineEffect.iterations = -1;
 			lineEffect.particle = ParticleEffect.PORTAL;
 			
-			Location startLoc = owner.getLocation();
-			Location endLoc = target.getLocation();
-			
-			Location midpoint = new Location(owner.getWorld(), (startLoc.getX()+endLoc.getX())/2, 
-					(startLoc.getY()+endLoc.getY())/2, (startLoc.getZ()+endLoc.getZ())/2);
-			
-			lineEffect.setDynamicOrigin(new DynamicLocation(new Location(owner.getWorld(), 0, 0, 0)));
-			lineEffect.setDynamicTarget(new DynamicLocation(new Location(owner.getWorld(), 0, 0, 0)));
+			lineEffect.setDynamicOrigin(new DynamicLocation(new Location(((Player) owner).getWorld(), 0, 0, 0)));
+			lineEffect.setDynamicTarget(new DynamicLocation(new Location(((Player) owner).getWorld(), 0, 0, 0)));
 			//lineEffect.particleOffsetX = 1;
 			//lineEffect.particleOffsetY = 1;
 			lineEffect.start();

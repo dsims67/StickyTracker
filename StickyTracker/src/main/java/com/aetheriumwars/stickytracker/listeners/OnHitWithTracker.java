@@ -9,6 +9,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.aetheriumwars.stickytracker.StickyTracker;
+import com.aetheriumwars.stickytracker.enums.EnumPermission;
 import com.aetheriumwars.stickytracker.tracker.Tracker;
 
 import net.md_5.bungee.api.ChatColor;
@@ -22,8 +23,16 @@ public class OnHitWithTracker implements Listener{
 			Player trackee = (Player) ev.getEntity();
 			int trackerId = StickyTracker.getTrackerItemId();
 			
-			Bukkit.getLogger().info("Material: "+tracker.getItemInHand().getType().toString()+" id: "+tracker.getItemInHand().getTypeId());
-			//if(tracker.getItemInHand().getType().equals(StickyTracker.trackerItem)) {
+			//if the player does not have permissions to use the trackers, don't allow them to attach it
+			if(EnumPermission.ST_USE.hasPermission(tracker) == false) {
+				return;
+			}
+			else if(EnumPermission.ST_UNTRACKABLE.hasPermission(trackee)) {
+				tracker.sendMessage(ChatColor.RED+"Trackers cannot be attached to this player");
+				return;
+			}
+			
+			//Bukkit.getLogger().info("Material: "+tracker.getItemInHand().getType().toString()+" id: "+tracker.getItemInHand().getTypeId());
 			if(tracker.getItemInHand().getTypeId() == trackerId) {
 				if(Tracker.hasTracker(tracker)) {
 					Tracker.removeTrackerOwnedBy(tracker);
