@@ -1,5 +1,5 @@
 # StickyTracker
-StickyTracker by savior67
+StickyTracker by savior67 - 
 License: 
 MIT 
 
