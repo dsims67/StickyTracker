@@ -45,23 +45,30 @@ public class StickyTracker extends JavaPlugin{
 	
 	private static HashMap<UUID, Tracker> trackers = new HashMap<UUID, Tracker>();
 	
-	public static Material trackerItem = Material.DAYLIGHT_DETECTOR;
+	//Configuration options
+	private static int trackerItemId;
+	private static boolean fireDestroyEnabled;
+	
 	private static int closestProximity = 10; //when the tracker gets within this distance of the trackee, the particles disappear
 	private static String trackerFilename = "trackers.json";
 	
 	@Override
 	public void onEnable() {
 		st = this;	
-		effectManager = new EffectManager(this);
-		
-		//init config
-		this.saveDefaultConfig();
-		config = this.getConfig();
+		effectManager = new EffectManager(this);	
 		//this.getConfig().options().copyDefaults(true);
 		
+		//create config if it doesn't exist
 		File configFile = new File(getPlugin().getDataFolder()+File.separator+"config.yml");
-		/*if(!configFile.exists())
-			initConfig();*/
+		if(!configFile.exists())
+			saveDefaultConfig();
+		
+		//init config
+		config = this.getConfig();
+		
+		//set config vars
+		trackerItemId = config.getInt("tracker-item");
+		fireDestroyEnabled = config.getBoolean("fire-destroy-enabled");
 		
 		//make trackerdata folder
 		File trackerFile = new File(getPlugin().getDataFolder()+File.separator+trackerFilename);
@@ -82,8 +89,10 @@ public class StickyTracker extends JavaPlugin{
 		registerListener(new OnPlayerJoin());
 		registerListener(new OnPlayerQuit());
 		registerListener(new OnHitWithTracker());
-		registerListener(new OnFireDamage());
 		registerListener(new OnPlayerDeath());
+		
+		if(fireDestroyEnabled)
+			registerListener(new OnFireDamage());
 
 		//register commands
         getCommand("stickytracker").setExecutor(new CommandHandler());
@@ -206,6 +215,10 @@ public class StickyTracker extends JavaPlugin{
 	
 	private void registerListener(Listener l) {
 		this.getServer().getPluginManager().registerEvents(l, this);
+	}
+	
+	public static int getTrackerItemId() {
+		return trackerItemId;
 	}
 	
 }

@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.aetheriumwars.stickytracker.StickyTracker;
 import com.aetheriumwars.stickytracker.tracker.Tracker;
 
 import net.md_5.bungee.api.ChatColor;
@@ -19,9 +20,11 @@ public class OnHitWithTracker implements Listener{
 		if(ev.getEntity() instanceof Player && ev.getDamager() instanceof Player) {
 			Player tracker = (Player) ev.getDamager();
 			Player trackee = (Player) ev.getEntity();
+			int trackerId = StickyTracker.getTrackerItemId();
+			
 			Bukkit.getLogger().info("Material: "+tracker.getItemInHand().getType().toString()+" id: "+tracker.getItemInHand().getTypeId());
 			//if(tracker.getItemInHand().getType().equals(StickyTracker.trackerItem)) {
-			if(tracker.getItemInHand().getTypeId() == 151) {
+			if(tracker.getItemInHand().getTypeId() == trackerId) {
 				if(Tracker.hasTracker(tracker)) {
 					Tracker.removeTrackerOwnedBy(tracker);
 				}

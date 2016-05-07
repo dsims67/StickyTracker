@@ -1,0 +1,7 @@
+#Sticky Tracker Configuration File - By Savior67
+
+#The Tracker Item ID
+tracker-item: 151
+#If enabled trackers attached to players are destroyed if the player takes fire damage
+fire-destroy-enabled: true
+
