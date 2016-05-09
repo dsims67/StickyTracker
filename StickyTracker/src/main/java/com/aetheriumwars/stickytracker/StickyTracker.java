@@ -141,7 +141,7 @@ public class StickyTracker extends JavaPlugin{
 	            		}
 	            		else if(t.hiddenByPlayer() == false){
 	            			if(owner.getLocation().distance(target.getLocation()) > closestProximity && t.isHidden()) {
-	            				t.generateTrail();
+	            				t.show();
 	            			}
 	            		}
 	            		

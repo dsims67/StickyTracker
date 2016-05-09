@@ -32,7 +32,7 @@ public class Tracker {
 	private LineEffect lineEffect;
 	
 	private Entity armorStand;
-	private Entity slime;
+	//private Entity slime;
 	
 	public Tracker(Player owner, Player target) {
 		this.ownerId = owner.getUniqueId();
@@ -62,7 +62,6 @@ public class Tracker {
 			removeTrackerOwnedBy((Player) t.getOwner());
 
 		StickyTracker.getTrackers().put(t.getOwnerID(), t);
-		//t.spawnTracker();
 		StickyTracker.saveTrackers();
 	}
 	
@@ -71,7 +70,6 @@ public class Tracker {
 		if(hasTracker(p)) {
 			Tracker t = StickyTracker.getTrackers().get(p.getUniqueId());
 			t.removeTrail();
-			//t.despawnTracker();
 			StickyTracker.getTrackers().remove(p.getUniqueId());
 			//create an explosion at targets location
 			Player target = (Player) t.getTarget();
@@ -130,11 +128,12 @@ public class Tracker {
 		
 		World w = p.getWorld();
 		armorStand = w.spawnEntity(p.getLocation(), EntityType.ARMOR_STAND);
-		slime = w.spawnEntity(p.getLocation(), EntityType.SLIME);
+		
+		/*slime = w.spawnEntity(p.getLocation(), EntityType.SLIME);
 		((Slime) slime).setInvulnerable(true);
 		((Slime) slime).setAI(false);
 		((Slime) slime).setSize(2);
-		slime.setPassenger(armorStand);
+		slime.setPassenger(armorStand);*/
 		p.setPassenger(armorStand);
 		((ArmorStand) armorStand).setHelmet(skull);
 		((ArmorStand) armorStand).setVisible(false);
@@ -150,10 +149,10 @@ public class Tracker {
 			armorStand = null;
 		}
 		
-		if(slime != null) {
+		/*if(slime != null) {
 			slime.remove();
 			slime = null;
-		}
+		}*/
 		return;
 	}
 	
@@ -196,7 +195,7 @@ public class Tracker {
 	
 	//hides the tracker and the trail
 	public void hide() {
-		//despawnTracker();
+		despawnTracker();
 		removeTrail();
 	}
 	
@@ -205,7 +204,7 @@ public class Tracker {
 		if(getOwner() != null && getTarget() != null) {
 			hide(); //remove the old stuff so there's no doubling up of trails/trackers
 			generateTrail();
-			//spawnTracker();
+			spawnTracker();
 		}
 	}
 	

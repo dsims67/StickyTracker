@@ -1,6 +1,6 @@
 name: StickyTracker
 author: savior67
-version: Beta 1.1.0
+version: R1.2.0
 load: POSTWORLD
 main: com.aetheriumwars.stickytracker.StickyTracker
 commands:
