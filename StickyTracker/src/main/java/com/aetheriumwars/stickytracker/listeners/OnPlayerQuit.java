@@ -4,7 +4,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import com.aetheriumwars.stickytracker.StickyTracker;
 import com.aetheriumwars.stickytracker.tracker.Tracker;
 
 public class OnPlayerQuit implements Listener{
@@ -13,7 +12,7 @@ public class OnPlayerQuit implements Listener{
 	public void onQuit(PlayerQuitEvent event) {
 		//remove the trail if a player logs off
 		if(Tracker.hasTracker(event.getPlayer())) {
-			StickyTracker.getTrackers().get(event.getPlayer()).hide();
+			Tracker.getTracker(event.getPlayer()).hide();
 		}
 		
 		Tracker t = Tracker.isBeingTracked(event.getPlayer());

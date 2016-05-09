@@ -100,7 +100,10 @@ public class Tracker {
 	
 	//Returns true if the player has a tracker
 	public static boolean hasTracker(Player p) {
-		return(StickyTracker.getTrackers().containsKey(p.getUniqueId()));
+		if(StickyTracker.getTrackers().get(p.getUniqueId()) == null)
+			return false;
+		else
+			return true;
 	}
 	
 	//Returns the tracker if the player is being tracked, otherwise returns null
